@@ -56,6 +56,7 @@ app.post('/signin', (req, res) => {
 
 
 const verifyToken = (req, res, next) => {
+  
     const token = req.header('Authorization');
     if (!token) return res.sendStatus(403); // Forbidden
   
@@ -70,7 +71,7 @@ const verifyToken = (req, res, next) => {
   
 //   create item 
 
-app.post('/items', (req, res) => {
+app.post('/items',verifyToken, (req, res) => {
     const { name, description } = req.body;
 
     if (!name || !description) {
@@ -86,7 +87,7 @@ app.post('/items', (req, res) => {
 
 //   Get Item 
 
-app.get('/items', (req, res) => {
+app.get('/items',verifyToken, (req, res) => {
 
     db.query('SELECT * FROM items', (err, results) => {
       if (err) return res.status(500).json({ message: 'Error fetching items.' });
@@ -96,7 +97,7 @@ app.get('/items', (req, res) => {
 
 //   Get item by single id 
 
-app.get('/items/:id', (req, res) => {
+app.get('/items/:id',verifyToken, (req, res) => {
     const itemId = req.params.id;
   
     
@@ -114,7 +115,7 @@ app.get('/items/:id', (req, res) => {
   
 //   Update item by id 
 
-app.put('/items/:id', (req, res) => {
+app.put('/items/:id',verifyToken, (req, res) => {
     const itemId = req.params.id;
     const { name, description } = req.body;
   
@@ -135,7 +136,7 @@ app.put('/items/:id', (req, res) => {
 
 //   Delete item by id 
 
-app.delete('/items/:id', (req, res) => {
+app.delete('/items/:id',verifyToken, (req, res) => {
     const itemId = req.params.id;
   
     db.query('DELETE FROM items WHERE id = ?', [itemId], (err, result) => {
