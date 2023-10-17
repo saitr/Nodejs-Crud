@@ -1,6 +1,7 @@
 const { secretKey } = require("../../config");
 const { db } = require("../database/connection");
 const jwt = require('jsonwebtoken')
+
 const signup = async(req,res)=>{
     try {
         const { username, password } = req.body;
@@ -13,6 +14,7 @@ const signup = async(req,res)=>{
         
     }
 }
+
 
 const signin = async(req,res)=>{
     try {
