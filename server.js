@@ -1,154 +1,143 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
 const mysql = require('mysql');
-const { secretKey } = require('./config');
+// const { secretKey } = require('./config');
+require('./src/database/connection')
+
 const app = express();
 app.use(bodyParser.json());
 
-// const secretKey = 'your_secret_key'; // Change this to your own secret key
 
 // Database connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'Sai481309@',
-  database: 'Items'
-});
 
-db.connect(err => {
-  if (err) throw err;
-  console.log('Connected to database');
-});
 
+const auth_routes = require('./src/routes/auth_routes')
+app.use(auth_routes)
 
 
 // Signup
-app.post('/signup', (req, res) => {
-  const { username, password } = req.body;
+// app.post('/signup', (req, res) => {
+//   const { username, password } = req.body;
 
-  // You should hash the password before saving it in the database for security
-  // For simplicity, we'll just save the plain password
-  db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err, result) => {
-    if (err) return res.status(500).send('Error registering user');
-    res.json({ message: 'User registered successfully' });
-  });
-});
+//   db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err, result) => {
+//     if (err) return res.status(500).send('Error registering user');
+//     res.json({ message: 'User registered successfully' });
+//   });
+// });
 
-// Signin
-app.post('/signin', (req, res) => {
-  const { username, password } = req.body;
+// // Signin
+// app.post('/signin', (req, res) => {
+//   const { username, password } = req.body;
 
-  // You should validate the username and password against the database
-  // For simplicity, we'll just check the provided values
-  db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, results) => {
-    if (err) return res.status(500).send('Error authenticating user');
+//   db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, results) => {
+//     if (err) return res.status(500).send('Error authenticating user');
 
-    if (results.length === 0) {
-      return res.status(403).json({ message: 'Invalid credentials' });
-    }
+//     if (results.length === 0) {
+//       return res.status(403).json({ message: 'Invalid credentials' });
+//     }
 
-    const user = { id: results[0].id, username: results[0].username };
-    const token = jwt.sign(user, secretKey);
-    res.json({ token });
-  });
-});
+//     const user = { id: results[0].id, username: results[0].username };
+//     const token = jwt.sign(user, secretKey);
+//     res.json({ token });
+//   });
+// });
 
+// // To verify token wheather it exists or not 
 
-const verifyToken = (req, res, next) => {
+// const verifyToken = (req, res, next) => {
   
-    const token = req.header('Authorization');
-    if (!token) return res.sendStatus(403); // Forbidden
+//     const token = req.header('Authorization');
+//     if (!token) return res.sendStatus(403); // Forbidden
   
-    jwt.verify(token.split(' ')[1], secretKey, (err, user) => {
-      if (err) return res.sendStatus(403); // Forbidden
-      req.user = user;
-      next();
-    });
-  };
+//     jwt.verify(token.split(' ')[1], secretKey, (err, user) => {
+//       if (err) return res.sendStatus(403); // Forbidden
+//       req.user = user;
+//       next();
+//     });
+//   };
   
 
   
-//   create item 
+// //   create item 
 
-app.post('/items',verifyToken, (req, res) => {
-    const { name, description } = req.body;
+// app.post('/items',verifyToken, (req, res) => {
+//     const { name, description } = req.body;
 
-    if (!name || !description) {
-      return res.status(400).json({ message: 'Name and description are required.' });
-    }
+//     if (!name || !description) {
+//       return res.status(400).json({ message: 'Name and description are required.' });
+//     }
   
     
-    db.query('INSERT INTO items (name, description) VALUES (?, ?)', [name, description], (err, result) => {
-      if (err) return res.status(500).json({ message: 'Error creating item.' });
-      res.json({ message: 'Item created successfully.' });
-    });
-  });
+//     db.query('INSERT INTO items (name, description) VALUES (?, ?)', [name, description], (err, result) => {
+//       if (err) return res.status(500).json({ message: 'Error creating item.' });
+//       res.json({ message: 'Item created successfully.' });
+//     });
+//   });
 
-//   Get Item 
+// //   Get Item 
 
-app.get('/items',verifyToken, (req, res) => {
+// app.get('/items',verifyToken, (req, res) => {
 
-    db.query('SELECT * FROM items', (err, results) => {
-      if (err) return res.status(500).json({ message: 'Error fetching items.' });
-      res.json(results);
-    });
-  });
+//     db.query('SELECT * FROM items', (err, results) => {
+//       if (err) return res.status(500).json({ message: 'Error fetching items.' });
+//       res.json(results);
+//     });
+//   });
 
-//   Get item by single id 
+// //   Get item by single id 
 
-app.get('/items/:id',verifyToken, (req, res) => {
-    const itemId = req.params.id;
+// app.get('/items/:id',verifyToken, (req, res) => {
+//     const itemId = req.params.id;
   
     
-    db.query('SELECT * FROM items WHERE id = ?', [itemId], (err, results) => {
-      if (err) return res.status(500).json({ message: 'Error fetching item.' });
+//     db.query('SELECT * FROM items WHERE id = ?', [itemId], (err, results) => {
+//       if (err) return res.status(500).json({ message: 'Error fetching item.' });
   
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'Item not found.' });
-      }
+//       if (results.length === 0) {
+//         return res.status(404).json({ message: 'Item not found.' });
+//       }
   
-      res.json(results[0]);
-    });
-  });
+//       res.json(results[0]);
+//     });
+//   });
 
   
-//   Update item by id 
+// //   Update item by id 
 
-app.put('/items/:id',verifyToken, (req, res) => {
-    const itemId = req.params.id;
-    const { name, description } = req.body;
+// app.put('/items/:id',verifyToken, (req, res) => {
+//     const itemId = req.params.id;
+//     const { name, description } = req.body;
   
-    if (!name || !description) {
-      return res.status(400).json({ message: 'Name and description are required.' });
-    }
+//     if (!name || !description) {
+//       return res.status(400).json({ message: 'Name and description are required.' });
+//     }
   
-    db.query('UPDATE items SET name = ?, description = ? WHERE id = ?', [name, description, itemId], (err, result) => {
-      if (err) return res.status(500).json({ message: 'Error updating item.' });
+//     db.query('UPDATE items SET name = ?, description = ? WHERE id = ?', [name, description, itemId], (err, result) => {
+//       if (err) return res.status(500).json({ message: 'Error updating item.' });
   
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: 'Item not found.' });
-      }
+//       if (result.affectedRows === 0) {
+//         return res.status(404).json({ message: 'Item not found.' });
+//       }
   
-      res.json({ message: 'Item updated successfully.' });
-    });
-  });
+//       res.json({ message: 'Item updated successfully.' });
+//     });
+//   });
 
-//   Delete item by id 
+// //   Delete item by id 
 
-app.delete('/items/:id',verifyToken, (req, res) => {
-    const itemId = req.params.id;
+// app.delete('/items/:id',verifyToken, (req, res) => {
+//     const itemId = req.params.id;
   
-    db.query('DELETE FROM items WHERE id = ?', [itemId], (err, result) => {
-      if (err) return res.status(500).json({ message: 'Error deleting item.' });
+//     db.query('DELETE FROM items WHERE id = ?', [itemId], (err, result) => {
+//       if (err) return res.status(500).json({ message: 'Error deleting item.' });
   
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: 'Item not found.' });
-      }
+//       if (result.affectedRows === 0) {
+//         return res.status(404).json({ message: 'Item not found.' });
+//       }
   
-      res.json({ message: 'Item deleted successfully.' });
-    });
-  });
+//       res.json({ message: 'Item deleted successfully.' });
+//     });
+//   });
   
 
 const PORT = process.env.PORT || 3000;
