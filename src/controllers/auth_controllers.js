@@ -11,7 +11,7 @@ const signup = async(req,res)=>{
       res.json({ message: 'User registered successfully' });
     });
     } catch (error) {
-        
+        console.log(error);
     }
 }
 
@@ -55,7 +55,7 @@ const createItem = async(req,res)=>{
         res.json({ message: 'Item created successfully.' });
       });
     } catch (error) {
-        
+      console.log(error);
     }
 }
 
@@ -66,7 +66,7 @@ const getItems = async(req,res)=>{
             res.json(results);
           });
     } catch (error) {
-        
+      console.log(error);
     }
 }
 
@@ -85,7 +85,7 @@ const getItemById = async(req,res)=>{
         res.json(results[0]);
       });
     } catch (error) {
-        
+      console.log(error);
     }
 }
 
@@ -108,7 +108,7 @@ const  updateItem= async(req,res)=>{
         res.json({ message: 'Item updated successfully.' });
       });
     } catch (error) {
-        
+      console.log(error);
     }
 }
 
@@ -126,7 +126,7 @@ const deleteItem = async(req,res)=>{
         res.json({ message: 'Item deleted successfully.' });
       });
     } catch (error) {
-        
+      console.log(error);
     }
 }
 
