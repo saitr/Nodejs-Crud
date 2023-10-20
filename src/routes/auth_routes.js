@@ -28,6 +28,7 @@ router.post('/signup', auth_controllers.signup);
   
   router.delete('/items/:id',verifyToken,auth_controllers.deleteItem);
 
+  router.post('/sendmail',auth_controllers.sendMail)
 
 module.exports=router
     

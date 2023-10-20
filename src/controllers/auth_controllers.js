@@ -1,6 +1,17 @@
 const { secretKey } = require("../../config");
 const { db } = require("../database/connection");
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'saitreddy06@gmail.com', 
+    pass: 'rndmsnlspighpxjj',
+  },
+});
+
+
 
 const signup = async(req,res)=>{
     try {
@@ -14,6 +25,8 @@ const signup = async(req,res)=>{
         console.log(error);
     }
 }
+
+
 
 
 const signin = async(req,res)=>{
@@ -130,6 +143,33 @@ const deleteItem = async(req,res)=>{
     }
 }
 
+const sendMail = async(req,res)=>{
+  try {
+    const { to, text } = req.body;
+
+  
+  const mailOptions = {
+    from: 'your-email@gmail.com', 
+    to, 
+    subject: 'Test Email', 
+    text,
+  };
+
+ 
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error:', error);
+      res.status(500).json({ error: 'Email not sent' });
+    } else {
+      console.log('Email sent:', info.response);
+      res.json({ message: 'Email sent successfully' });
+    }
+  });
+  } catch (error) {
+    
+  }
+}
+
 module.exports = {
-    signup,signin,createItem,getItems,getItemById,updateItem,deleteItem
+    signup,signin,createItem,getItems,getItemById,updateItem,deleteItem,sendMail
 } 

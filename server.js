@@ -1,15 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
-// const { secretKey } = require('./config');
 require('./src/database/connection')
 
 const app = express();
 app.use(bodyParser.json());
-
-
-// Database connection
-
 
 const auth_routes = require('./src/routes/auth_routes')
 app.use(auth_routes)
