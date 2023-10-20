@@ -149,7 +149,7 @@ const sendMail = async(req,res)=>{
 
   
   const mailOptions = {
-    from: 'your-email@gmail.com', 
+    from: 'saitreddy06@gmail.com', 
     to, 
     subject: 'Test Email', 
     text,
@@ -159,7 +159,7 @@ const sendMail = async(req,res)=>{
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log('Error:', error);
-      res.status(500).json({ error: 'Email not sent' });
+      res.status(500).json({ error: 'Email not sent to mail id that you have specified' });
     } else {
       console.log('Email sent:', info.response);
       res.json({ message: 'Email sent successfully' });
@@ -172,4 +172,4 @@ const sendMail = async(req,res)=>{
 
 module.exports = {
     signup,signin,createItem,getItems,getItemById,updateItem,deleteItem,sendMail
-} 
+}
