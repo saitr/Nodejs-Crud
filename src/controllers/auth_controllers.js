@@ -2,9 +2,11 @@ const { secretKey } = require("../../config");
 const { db } = require("../database/connection");
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer');
-const fileUpload = require('express-fileupload');
+// const express = require('express');
+// const fileUpload = require('express-fileupload');
 const csv = require('csv-parser');
-const fs = require('fs');
+
+
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -173,55 +175,44 @@ const sendMail = async(req,res)=>{
   }
 }
 
-app.post('/upload', (req, res) => {
-  if (!req.files || !req.files.file) {
+const uploadFile = (req,res)=>{
+  // console.log('request',req);
+  // console.log('response',res);
+  // console.log(req);
+  // console.log(req.files);
+  if (!req.files || Object.keys(req.files).length === 0) {
+
     return res.status(400).json({ message: 'No files were uploaded.' });
   }
-
   const file = req.files.file;
 
-  file.mv('uploads/' + file.name, (err) => {
-    if (err) {
-      return res.status(500).send(err);
-    }
+  const results = [];
 
-    const results = [];
+  const csvStream = csv();
 
-    fs.createReadStream('uploads/' + file.name)
-      .pipe(csv())
-      .on('data', (data) => results.push(data))
-      .on('end', () => {
-        const createTableQuery = `
-          CREATE TABLE IF NOT EXISTS record (
-            name VARCHAR(255),
-            email VARCHAR(255),
-            description VARCHAR(10000)
-          )`;
+  csvStream.on('data', (data) => results.push(data));
+  csvStream.on('end', () => {
+    const insertQuery = 'INSERT INTO records (name, email, description) VALUES ?';
+    const values = results.map((result) => [result.name, result.email, result.description]);
 
-        db.query(createTableQuery, (err, result) => {
-          if (err) {
-            console.error('Error creating table:', err);
-            return res.status(500).json({ message: 'Error creating table.' });
-          }
-
-          const insertQuery = 'INSERT INTO record (name, email, description) VALUES ?';
-          const values = results.map((result) => [result.name, result.email, result.description]);
-
-          db.query(insertQuery, [values], (err, result) => {
-            if (err) {
-              console.error('Error inserting records:', err);
-              return res.status(500).json({ message: 'Error inserting records.' });
-            }
-
-            res.status(200).json({ message: 'Records inserted successfully.' });
-          });
-        });
-      });
+    db.query(insertQuery, [values], (err, result) => {
+      if (err) {
+        console.error('Error inserting records:', err);
+        res.status(500).json({ message: 'Error inserting records.' });
+      } else {
+        res.status(200).json({ message: 'Records inserted successfully.' });
+      }
+    });
   });
-});
+
+  const fileData = Buffer.from(file.data); 
+
+  csvStream.write(fileData);
+  csvStream.end();
+}
 
 
 
 module.exports = {
-    signup,signin,createItem,getItems,getItemById,updateItem,deleteItem,sendMail,uploadCSV
+    signup,signin,createItem,getItems,getItemById,updateItem,deleteItem,sendMail,uploadFile
 }
