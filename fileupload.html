@@ -1,0 +1,17 @@
+<!-- upload.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload CSV File</title>
+</head>
+<body>
+  <form ref='uploadForm' 
+    id='uploadForm' 
+    action='/upload' 
+    method='post' 
+    encType="multipart/form-data">
+    <input type="file" name="file" />
+    <input type='submit' value='Upload!' />
+  </form>     
+</body>
+</html>

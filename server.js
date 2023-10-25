@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
+const fileUpload = require('express-fileupload');
 require('./src/database/connection')
 
 const app = express();
@@ -8,7 +9,7 @@ app.use(bodyParser.json());
 
 const auth_routes = require('./src/routes/auth_routes')
 app.use(auth_routes)
-
+app.use(fileUpload());
 
 // Signup
 // app.post('/signup', (req, res) => {
